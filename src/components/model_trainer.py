@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import sys
 from dataclasses import dataclass
 
@@ -42,30 +43,37 @@ class ModelTrainer:
                 "CatBoosting Regressor": CatBoostRegressor(verbose=False),
                 "AdaBoost Regressor": AdaBoostRegressor(),
             }
+
+            '''
+                Performing Model Optimization Hyper-parameter Pricisely 
+            '''
             params={
                 "Decision Tree": {
                     'criterion':['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
-                    # 'splitter':['best','random'],
-                    # 'max_features':['sqrt','log2'],
+                    'splitter':['best','random'],
+                    'max_features':['sqrt','log2'],
                 },
                 "Random Forest":{
-                    # 'criterion':['squared_error', 'friedman_mse', 'absolute_error', 'poisson'],
-                 
-                    # 'max_features':['sqrt','log2',None],
-                    'n_estimators': [8,16,32,64,128,256]
+                    'n_estimators': [i for i in range(10, 1001)],
+                    "max_depth": [None] + [x for x in range(1, 101)],
+                    "min_samples_split": [y for y in range(2, 10)],
+                    "max_features": ["auto", "sqrt"],
                 },
                 "Gradient Boosting":{
                     # 'loss':['squared_error', 'huber', 'absolute_error', 'quantile'],
-                    'learning_rate':[.1,.01,.05,.001],
-                    'subsample':[0.6,0.7,0.75,0.8,0.85,0.9],
-                    # 'criterion':['squared_error', 'friedman_mse'],
-                    # 'max_features':['auto','sqrt','log2'],
-                    'n_estimators': [8,16,32,64,128,256]
+                    'learning_rate':np.arange(0.01, 0.1, 0.01),
+                    'subsample':np.arange(0.5, 1.0, 0.1),
+                    'criterion':['squared_error', 'friedman_mse'],
+                    'max_features':['auto','sqrt','log2'],
+                    'n_estimators': [k for k in range(100, 1001)]
                 },
                 "Linear Regression":{},
                 "XGBRegressor":{
-                    'learning_rate':[.1,.01,.05,.001],
-                    'n_estimators': [8,16,32,64,128,256]
+                    "learning_rate": np.arange(0.01, 0.1, 0.01),
+                    "max_depth": [j for j in range(1, 10)],
+                    "n_estimators": [k for k in range(100, 1001)],
+                    "subsample": np.arange(0.5, 1.0, 0.1)
+                
                 },
                 "CatBoosting Regressor":{
                     'depth': [6,8,10],
@@ -73,9 +81,9 @@ class ModelTrainer:
                     'iterations': [30, 50, 100]
                 },
                 "AdaBoost Regressor":{
-                    'learning_rate':[.1,.01,0.5,.001],
+                    'learning_rate':np.arange(0.01, 0.1, 0.01),
                     # 'loss':['linear','square','exponential'],
-                    'n_estimators': [8,16,32,64,128,256]
+                    'n_estimators': [k for k in range(100, 1001)]
                 }
                 
             }
